@@ -890,7 +890,9 @@ void do_mutilate(const vector<string>& servers, options_t& options,
 
   start = get_time();
   for (TCPConnection *conn: connections) {
+    V("connection start");
     conn->start_time = start;
+    conn->issue_nop();
     conn->drive_write_machine(); // Kick the Connection into motion.
   }
 

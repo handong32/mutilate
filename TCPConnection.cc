@@ -159,8 +159,7 @@ void TCPConnection::issue_get(const char* key, double now) {
   if (read_state != LOADING) stats.tx_bytes += l;
 }
 
-void TCPConnection::issue_set(const char* key, const char* value, int length,
-                           double now) {
+void TCPConnection::issue_set(const char* key, const char* value, int length, double now) {
   Operation op;
   int l;
   uint16_t keylen = strlen(key);
@@ -247,6 +246,17 @@ bool TCPConnection::check_exit_condition(double now) {
   if (now > start_time + options.time) return true;
   if (options.loadonly && read_state == IDLE) return true;
   return false;
+}
+
+void TCPConnection::issue_nop() {
+
+  // each line is 4-bytes
+  binary_header_t h = { 0x80, CMD_NOP, 0,
+			0x00, 0x00, 0, //TODO(syang0) get actual vbucket?
+		        0};
+  
+  bufferevent_write(bev, &h, 24); // With extras
+  V("issue_nop\n");
 }
 
 // drive_write_machine() determines whether or not to issue a new
